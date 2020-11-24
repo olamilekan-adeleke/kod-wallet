@@ -98,6 +98,8 @@ Widget button({Stream<bool> loadingStream, Function function}) {
   return StreamBuilder<bool>(
     stream: loadingStream,
     builder: (context, snapshot) {
+      print('jjjjjjjj');
+      print(snapshot.data);
       if (snapshot.data == true) {
         return customTransferButton(
           function: () {

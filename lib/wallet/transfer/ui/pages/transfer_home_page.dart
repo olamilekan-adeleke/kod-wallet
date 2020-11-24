@@ -11,11 +11,11 @@ class TransferHomePage extends StatefulWidget {
   _TransferHomePageState createState() => _TransferHomePageState();
 }
 
-class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepAliveClientMixin{
+class _TransferHomePageState extends State<TransferHomePage> {
   final accountNumberFormKey = GlobalKey<FormState>();
   final amountAndDesFormKey = GlobalKey<FormState>();
   StreamController<bool> loadingReceiverDataStream =
-      StreamController<bool>.broadcast();
+      StreamController<bool>.broadcast()..add(false);
   TextEditingController receiverAccountNumController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -45,7 +45,6 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
         ),
       );
 
-      //TODO: clear form
       loadingReceiverDataStream.add(false);
     } else {
       showBasicsFlash(context: context, message: 'Please Provide Vaild Inputs');
@@ -61,6 +60,7 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: customTransferAppBar(title: 'Transfers'),
       body: bodyList(),
     );
@@ -70,11 +70,23 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
     return ListView(
       children: [
         SizedBox(height: 40),
+        headerImage(),
+        SizedBox(height: 40),
         accountNumberForm(),
         amountAndDesForm(),
         SizedBox(height: 60),
         buttonBlocStream(),
       ],
+    );
+  }
+
+  Widget headerImage() {
+    return Container(
+      child: Image.asset(
+        'asset/images/transfer_money.png',
+        fit: BoxFit.contain,
+        height: 150,
+      ),
     );
   }
 
@@ -95,6 +107,9 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
             color: Colors.green,
             duration: Duration(seconds: 4),
           );
+
+          amountAndDesFormKey.currentState.reset();
+          accountNumberFormKey.currentState.reset();
         }
       },
       builder: (context, state) {
@@ -103,7 +118,8 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
         }
 
         return button(
-          loadingStream: loadingReceiverDataStream.stream,
+          loadingStream: loadingReceiverDataStream.stream
+              .where((event) => event == true || event == false),
           function: () => makeTransfer(),
         );
       },
@@ -122,6 +138,7 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
             duration: Duration(seconds: 4),
           );
         } else if (state is LoadedGetReceiverDetailsState) {
+          print('1');
           if (state.userDetails == null) {
             showBasicsFlash(
               context: context,
@@ -130,7 +147,9 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
             );
           } else {
             loadingReceiverDataStream.add(true);
+            print('2');
           }
+          print('3');
         } else if (state is LoadingGetReceiverDetailsState) {
           loadingReceiverDataStream.add(false);
         }
@@ -140,7 +159,9 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
           return receiverDataWidget(message: 'Enter Account Number....');
         } else if (state is LoadingGetReceiverDetailsState) {
           return receiverDataWidget(
-              message: 'Loading....', color: Colors.green);
+            message: 'Loading....',
+            color: Colors.green,
+          );
         } else if (state is LoadedGetReceiverDetailsState) {
           if (state.userDetails == null) {
             return receiverDataWidget(
@@ -173,6 +194,7 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
           children: <Widget>[
             formTitle('Enter Receiver Account Number'),
             customTransferTextField(
+              keyboardAction: TextInputAction.done,
               keyboardType: TextInputType.number,
               padding: EdgeInsets.symmetric(horizontal: 15),
               title: 'Receiver Account Number',
@@ -218,6 +240,6 @@ class _TransferHomePageState extends State<TransferHomePage> with AutomaticKeepA
     );
   }
 
-  @override
-  bool get wantKeepAlive => true;
+//  @override
+//  bool get wantKeepAlive => true;
 }

@@ -1,7 +1,7 @@
-import 'dart:async';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:kod_wallet_app/auth/shared/shared_design.dart';
 import 'package:kod_wallet_app/wallet/home/ui/view/home_view.dart';
 import 'package:kod_wallet_app/wallet/stat/bloc/stat_bloc.dart';
@@ -15,14 +15,21 @@ class StatHomePage extends StatefulWidget {
   _StatHomePageState createState() => _StatHomePageState();
 }
 
-class _StatHomePageState extends State<StatHomePage> {
-  StreamController _dateStream = StreamController<DateTime>()
-    ..add(DateTime.now());
+class _StatHomePageState extends State<StatHomePage> with AutomaticKeepAliveClientMixin{
   Size _size;
+  int month = DateTime.now().month - 1;
+
+  void getMonth(int number) {
+    int _month = month + number;
+    if (_month >= 1 && _month <= 12) {
+      month = month + number;
+      BlocProvider.of<StatBloc>(context).add(GetStatEvent(month: month));
+      setState(() {});
+    }
+  }
 
   @override
   void dispose() {
-    _dateStream.close();
     super.dispose();
   }
 
@@ -30,6 +37,7 @@ class _StatHomePageState extends State<StatHomePage> {
   Widget build(BuildContext context) {
     _size = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: statAppBar(),
       body: Center(
         child: statUI(),
@@ -41,7 +49,7 @@ class _StatHomePageState extends State<StatHomePage> {
     return Container(
       child: ListView(
         children: [
-          header(),
+          monthSelector(),
           chartBlocUi(),
         ],
       ),
@@ -55,6 +63,9 @@ class _StatHomePageState extends State<StatHomePage> {
         if (state is LoadingStatState) {
           return Center(child: CircularProgressIndicator());
         } else if (state is LoadedStatState) {
+          if (state.statModel == null) {
+            return noDataUi();
+          }
           return chartUi(state.statModel);
         } else if (state is ErrorStatState) {
           return Container(
@@ -72,11 +83,39 @@ class _StatHomePageState extends State<StatHomePage> {
     );
   }
 
+  Widget noDataUi() {
+    DateTime _now = DateTime.now();
+    return Container(
+      height: _size.height * 0.60,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Container(
+            child: Image.asset(
+              'asset/images/no_data.png',
+              fit: BoxFit.contain,
+              height: 150,
+            ),
+          ),
+          Text(
+            'Opps, No Data Was Found For The Month '
+            '${DateFormat.MMMM().format(DateTime(_now.year, month, _now.day))}',
+            style: subTextStyle,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget chartUi(StatModel stat) {
     return ListView(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       children: [
+        header(),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10.0),
           child: CustomBarChart(
@@ -138,45 +177,19 @@ class _StatHomePageState extends State<StatHomePage> {
   }
 
   Widget header() {
+    DateTime _now = DateTime.now();
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10.0),
       padding: EdgeInsets.only(top: 20, bottom: 30),
-      child: Column(
-        children: [
-          Text(
-            'Your Spending For The Month',
-            style: headingTextStyle = TextStyle(
-              color: Colors.black,
-              fontSize: 20.0,
-              fontWeight: FontWeight.normal,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          monthWidget(),
-        ],
+      child: Text(
+        'Your Spendings For ${DateFormat.MMMM().format(DateTime(_now.year, month, _now.day))}',
+        style: headingTextStyle = TextStyle(
+          color: Colors.grey[700],
+          fontSize: 20.0,
+          fontWeight: FontWeight.w400,
+        ),
+        textAlign: TextAlign.center,
       ),
-    );
-  }
-
-  Widget monthWidget() {
-    return StreamBuilder<DateTime>(
-      stream: _dateStream.stream,
-      builder: (_, snapshot) {
-        if (snapshot.data != null) {
-          DateTime date = snapshot.data;
-          return Text(
-            '${date.toString().split(' ')[0]}',
-            style: subTextStyle,
-            textAlign: TextAlign.center,
-          );
-        } else {
-          return Text(
-            'Loading....',
-            style: subTextStyle,
-            textAlign: TextAlign.center,
-          );
-        }
-      },
     );
   }
 
@@ -194,4 +207,37 @@ class _StatHomePageState extends State<StatHomePage> {
       backgroundColor: Colors.white,
     );
   }
+
+  Widget monthSelector() {
+    DateTime _now = DateTime.now();
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.grey,
+            ),
+            onPressed: () => getMonth(-1),
+          ),
+          Text(
+            '${DateFormat.MMMM().format(DateTime(_now.year, month, _now.day))}',
+            style: subTextStyle,
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.grey,
+            ),
+            onPressed: () => getMonth(1),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }

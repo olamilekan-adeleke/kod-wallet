@@ -13,7 +13,7 @@ String currencyFormatter({@required int amount}) {
 Widget homeProfileImage({@required String url, BuildContext context}) {
   return InkWell(
     onTap: () {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ProfilePage(),

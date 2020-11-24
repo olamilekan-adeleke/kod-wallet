@@ -9,7 +9,6 @@ import 'package:kod_wallet_app/auth/model/user_model.dart';
 import 'package:kod_wallet_app/auth/shared/shared_design.dart';
 import 'package:kod_wallet_app/helper.dart';
 import 'package:kod_wallet_app/local_db/hive_methods.dart';
-import 'package:kod_wallet_app/wallet/landing_page.dart';
 import 'package:kod_wallet_app/wallet/profile/enum/update_profile_enum.dart';
 import 'package:kod_wallet_app/wallet/profile/ui/pages/update_address_page.dart';
 import 'package:kod_wallet_app/wallet/profile/ui/pages/update_email_page.dart';
@@ -67,6 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
                 await AuthMethods().signOut();
+                Navigator.of(dialogContext).pop();
               },
             ),
             FlatButton(
@@ -94,12 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: customProfileAppBar(
         title: 'Profile',
         function: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LandingPage(),
-            ),
-          );
+          Navigator.pop(context);
         },
       ),
       body: bodyStream(),

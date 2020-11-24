@@ -24,8 +24,11 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   void onTapChangePage(int pageIndex) {
-    pageController.animateToPage(pageIndex,
-        duration: Duration(milliseconds: 200), curve: Curves.bounceInOut);
+    pageController.animateToPage(
+      pageIndex,
+      duration: Duration(milliseconds: 20),
+      curve: Curves.bounceInOut,
+    );
   }
 
   void navigatorCallBack(int i) {
@@ -56,8 +59,10 @@ class _LandingPageState extends State<LandingPage> {
         selectedFontSize: 14,
         unselectedFontSize: 12,
         showUnselectedLabels: true,
-        onTap: onTapChangePage, //
-        currentIndex: getPageIndex, //
+        onTap: onTapChangePage,
+        //
+        currentIndex: getPageIndex,
+        //
         items: [
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.wallet, size: 20),
