@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "992729572450",
+    "firebase_url": "https://kod-wallet.firebaseio.com",
+    "project_id": "kod-wallet",
+    "storage_bucket": "kod-wallet.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:992729572450:android:383d115f49edc28e841d3b",
+        "android_client_info": {
+          "package_name": "com.example.kod_wallet_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "992729572450-cq94ng9d0f0s7jb8rcu98pavre0i8l6q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMDNIAKp9ZDmSvmk6IY5uN2FMn8vlWl-M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "992729572450-cq94ng9d0f0s7jb8rcu98pavre0i8l6q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
