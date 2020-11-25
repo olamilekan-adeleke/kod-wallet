@@ -17,7 +17,7 @@ class StatHomePage extends StatefulWidget {
 
 class _StatHomePageState extends State<StatHomePage> with AutomaticKeepAliveClientMixin{
   Size _size;
-  int month = DateTime.now().month - 1;
+  int month = DateTime.now().month;
 
   void getMonth(int number) {
     int _month = month + number;
