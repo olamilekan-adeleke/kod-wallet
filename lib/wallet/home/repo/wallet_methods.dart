@@ -48,7 +48,10 @@ class WalletMethods {
   }) async {
     try {
       writeBatch.set(
-        walletHistory.doc(history.userUid).collection('userHistory').doc(history.uid),
+        walletHistory
+            .doc(history.userUid)
+            .collection('userHistory')
+            .doc(history.uid),
         history.toMap(),
         SetOptions(merge: true),
       );
@@ -81,7 +84,6 @@ class WalletMethods {
       throw Exception('Error: ${e.message}');
     }
   }
-
 
   //TODO: implement coin part
   ///

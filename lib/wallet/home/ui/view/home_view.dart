@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+// import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:kod_wallet_app/auth/methods/auth_methods.dart';
 import 'package:kod_wallet_app/auth/model/user_model.dart';
 import 'package:kod_wallet_app/wallet/profile/ui/pages/profile_page.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 String currencyFormatter({@required int amount}) {
   final formatter = new NumberFormat("#,##0.00", "en_US");
@@ -47,27 +49,32 @@ Widget homeProfileGreeting({@required String userName}) {
 }
 
 Widget userDetailWidget({@required Box userDataBox}) {
+  AuthMethods auth = AuthMethods();
+
   return ValueListenableBuilder(
     valueListenable: userDataBox.listenable(),
     builder: (BuildContext context, Box box, Widget child) {
-      if (box.isEmpty) {
-        return Center(child: Text('No data Found'));
-      } else {
-        Map data = box.get('userData');
-        data.remove('timestamp');
-        UserModel userData = UserModel.fromMap(data.cast<String, dynamic>());
-        return Container(
-          margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-          child: Row(
-            children: [
-              homeProfileImage(url: userData.profilePicUrl, context: context),
-              SizedBox(width: 20),
-              homeProfileGreeting(userName: userData.fullName),
-            ],
-          ),
-        );
-      }
+      // auth.signOut();
+      // if (box.isEmpty) {
+      //   return Center(child: Text('No data Found'));
+      // } else {
+      Map data = box.get('userData');
+      data?.remove('timestamp');
+      print(data);
+      UserModel userData =
+          UserModel.fromMap(data?.cast<String, dynamic>() ?? {});
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+        child: Row(
+          children: [
+            homeProfileImage(url: userData?.profilePicUrl, context: context),
+            SizedBox(width: 20),
+            homeProfileGreeting(userName: userData?.fullName ?? ''),
+          ],
+        ),
+      );
     },
+    // },
   );
 }
 

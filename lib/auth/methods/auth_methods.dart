@@ -39,12 +39,15 @@ class AuthMethods {
       );
 
       User user = result.user;
+      print(user.toString());
+      await HiveMethods().saveUserDataToLocalDb(userData: {'uid': user.uid});
+
       await getUserDetails(uid: user.uid);
 
       return userFromFirebase(user);
     } on SocketException {
       debugPrint('No Internet Connection!');
-      throw Exception('Erro: No Internet Connection!');
+      throw Exception('Error: No Internet Connection!');
     } catch (e, s) {
       print(e);
       print(e.message);
@@ -62,39 +65,40 @@ class AuthMethods {
     @required int accountNumber,
   }) async {
     try {
-      UserCredential result = await auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      User user = result.user;
-
-      UserModel userData = UserModel(
-        address: null,
-        uid: user.uid,
-        email: email,
-        fullName: fullName,
-        phoneNumber: phoneNumber,
-        profilePicUrl: null,
-        dateOfBirth: dateOfBirth.toString().split(' ')[0],
-        accountNumber: accountNumber,
-        timestamp: Timestamp.now(),
-      );
-
-      await checkPhoneNumber(phoneNumber: userData.phoneNumber)
-          .then((exist) async {
+      await checkPhoneNumber(phoneNumber: phoneNumber).then((exist) async {
         /// check if phone number is already taken.
         ///
         // TODO: Implement Check For Account Number Also
         if (exist) {
           throw Exception('Phone Number Already Exist');
         } else {
+          UserCredential result = await auth.createUserWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
+
+          User user = result.user;
+          await HiveMethods()
+              .saveUserDataToLocalDb(userData: {'uid': user.uid});
+
+          UserModel userData = UserModel(
+            address: null,
+            uid: user.uid,
+            email: email,
+            fullName: fullName,
+            phoneNumber: phoneNumber,
+            profilePicUrl: null,
+            dateOfBirth: dateOfBirth.toString().split(' ')[0],
+            accountNumber: accountNumber,
+            timestamp: Timestamp.now(),
+          );
+
           await writeUserDataToDataBase(userData: userData);
           await HiveMethods().saveUserDataToLocalDb(userData: userData.toMap());
         }
       });
 
-      return userFromFirebase(user);
+      // return userFromFirebase(user);
     } catch (e, s) {
       debugPrint(e);
       debugPrint(s.toString());
@@ -105,6 +109,7 @@ class AuthMethods {
   Future<void> signOut() async {
     try {
       await auth.signOut();
+      await HiveMethods().clearBox();
     } catch (e, s) {
       debugPrint(e.toString());
       debugPrint(s.toString());

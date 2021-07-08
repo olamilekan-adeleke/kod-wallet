@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_paystack/flutter_paystack.dart';
+import 'package:kod_wallet_app/constant.dart';
 import 'package:kod_wallet_app/local_db/init_hive.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +15,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await HiveInitMethods().startUserDataHiveDb();
+  await PaystackPlugin().initialize(publicKey: publicKey);
   runApp(MyApp());
 }
 

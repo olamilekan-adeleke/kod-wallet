@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_paystack/flutter_paystack.dart';
+
 import 'package:hive/hive.dart';
 import 'package:kod_wallet_app/auth/shared/shared_design.dart';
-import 'package:kod_wallet_app/constant.dart';
+
 import 'package:kod_wallet_app/local_db/hive_methods.dart';
 import 'package:kod_wallet_app/wallet/home/model/wallet_model.dart';
 import 'package:kod_wallet_app/wallet/home/repo/fund_wallet.dart';
@@ -14,15 +14,17 @@ import 'package:kod_wallet_app/wallet/home/repo/wallet_methods.dart';
 import 'package:kod_wallet_app/wallet/home/ui/view/home_view.dart';
 import 'package:kod_wallet_app/wallet/transfer/model/transfer_model.dart';
 import 'package:uuid/uuid.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   Box<Map> userDataBox;
-  StreamController loadedStream = StreamController<bool>();
+  StreamController loadedStream = StreamController<bool>.broadcast();
   Stream walletBalanceStream;
 
   Future<void> getBox() async {
@@ -76,22 +78,26 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
             ),
           ),
           actions: <Widget>[
-            FlatButton(
-              color: Theme.of(context).primaryColor,
-              child: Text('Fund', style: TextStyle(color: Colors.white)),
-              onPressed: () async {
-                print(_amount);
-                await fundWallet(amount: _amount);
-                Navigator.pop(context);
-              },
-            ),
-            Container(),
-            FlatButton(
-              color: Colors.grey[400],
-              child: Text('Cancel', style: TextStyle(color: Colors.white)),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                FlatButton(
+                  color: Theme.of(context).primaryColor,
+                  child: Text('Fund', style: TextStyle(color: Colors.white)),
+                  onPressed: () async {
+                    print(_amount);
+                    await fundWallet(amount: _amount);
+                    Navigator.pop(context);
+                  },
+                ),
+                FlatButton(
+                  color: Colors.grey[400],
+                  child: Text('Cancel', style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                  },
+                ),
+              ],
             ),
           ],
         );
@@ -103,7 +109,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
   void initState() {
     walletBalanceStream = WalletMethods().walletStream();
     getBox();
-    PaystackPlugin.initialize(publicKey: publicKey);
+
     super.initState();
   }
 
@@ -124,7 +130,12 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
               return ListView(
                 children: [
                   header(),
-                  balanceStream(),
+                  ValueListenableBuilder(
+                    valueListenable: userDataBox.listenable(),
+                    builder: (BuildContext context, Box box, Widget child) {
+                      return balanceStream();
+                    },
+                  ),
                   SizedBox(height: 20),
                   message(),
                   SizedBox(height: 10),

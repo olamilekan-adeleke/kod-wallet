@@ -28,6 +28,7 @@ class HiveMethods {
 
   Future<String> getUserUid() async {
     Box<Map> box = await getOpenBox(boxName: 'userDataBox');
+    print(box.values.toList());
     String uid = box.values.toList()[0]['uid'];
     return uid;
   }
@@ -42,5 +43,10 @@ class HiveMethods {
     Box<Map> box = await getOpenBox(boxName: 'userDataBox');
     Map data = box.values.toList()[0];
     return UserModel.fromMap(data.cast());
+  }
+
+  Future clearBox() async {
+    Box<Map> box = await getOpenBox(boxName: 'userDataBox');
+    await box.clear();
   }
 }

@@ -38,7 +38,7 @@ class FundWallet {
 
     String payload = json.encode(data);
     http.Response response = await http.post(
-      'https://api.paystack.co/transaction/initialize',
+      Uri.parse('https://api.paystack.co/transaction/initialize'),
       headers: headers,
       body: payload,
     );
@@ -61,7 +61,7 @@ class FundWallet {
       };
 
       http.Response response = await http.get(
-        'https://api.paystack.co/transaction/verify/' + reference,
+        Uri.parse('https://api.paystack.co/transaction/verify/' + reference),
         headers: headers,
       );
 
@@ -93,7 +93,7 @@ class FundWallet {
       ..reference = _getReference()
 //..accessCode = _createAcessCode(skTest, _getReference())
       ..email = userEmail;
-    CheckoutResponse response = await PaystackPlugin.checkout(
+    CheckoutResponse response = await PaystackPlugin().checkout(
       context,
       method: CheckoutMethod.card,
       charge: charge,
